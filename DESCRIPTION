@@ -7,6 +7,6 @@ Maintainer: Jose Luis Ricon <Jose-Luis.Ricon@amey.co.uk>
 Description: An efficient maximum entropy classifier, with some convenience functions
 License: GPL
 Encoding: UTF-8
-Depends: R (>= 2.13.0), methods, SparseM, maxent (>= 1.3.2), parallel, data.table, magrittr, quanteda
+Depends: R (>= 2.13.0), methods, SparseM, maxent (>= 1.3.2), parallel, data.table, magrittr, quanteda, Matrix
 LazyData: true
 RoxygenNote: 6.0.1

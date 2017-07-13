@@ -6,6 +6,7 @@
 #' @param verbose Output extra information
 #' @param cores How many cores to use
 #' @return A matrix with the best parameters found
+#' @export
 tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE,
           verbose = TRUE, cores = 1)
 {

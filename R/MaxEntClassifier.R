@@ -23,7 +23,7 @@ trainMC.matrix = function(feature_matrix,code_vector, l1_regularizer = 0.0, l2_r
 }
 #' @export
 trainMC.dfm = function(feature_matrix, l1_regularizer = 0.0, l2_regularizer = 0.0, use_sgd = FALSE, set_heldout = 0, verbose = FALSE ){
-  model   = maxent::maxent(feature_matrix,
+  model   = maxent::maxent(as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr"),
                            feature_matrix@docvars$labels,
                            l1_regularizer = l1_regularizer,
                            l2_regularizer = l2_regularizer,

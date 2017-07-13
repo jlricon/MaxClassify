@@ -19,7 +19,8 @@ create_weights_matrix = function(matrix, model) {
     )))
   ))
   t = merge(weights, corres, by = "Feature", all.x = TRUE)
-  return(as.data.frame.matrix(xtabs(data = t, Weight ~ Name + Label)))
+  t = as.data.frame.matrix(xtabs(data = t, Weight ~ Name + Label))
+  return(t)
 }
 
 #' Create a matrix from a vector of text. This function does not do any text cleaning.
@@ -38,9 +39,9 @@ create_weights_matrix = function(matrix, model) {
 create_training_matrix = function(Text,labels, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
                                     weighting=  "frequency", ngrams=1)
 {
-  matrix = dfm(corpus(Text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
-    dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength ) %>%
-    dfm_trim(min_docfreq = minDocFreq, max_docfreq = maxDocFreq) %>% dfm_weight(weighting)
+  matrix = quanteda::dfm(quanteda::corpus(Text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
+    quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength ) %>%
+    quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq) %>% quanteda::dfm_weight(weighting)
   matrix@settings$weighting = weighting
   matrix = matrix[,sort(colnames(matrix))]
   gc()
@@ -56,7 +57,7 @@ create_training_matrix = function(Text,labels, minDocFreq=1, maxDocFreq=Inf, min
 #' @import magrittr
 #' @export
 create_test_matrix = function(Text, training_matrix, ngrams = 1){
-  matrix = dfm(corpus(Text),ngrams = ngrams, tolower = FALSE) %>% dfm_select(features = colnames(orig_mat),padding = TRUE, valuetype = "fixed") %>%
+  matrix = dfm(corpus(Text),ngrams = ngrams, tolower = FALSE) %>% dfm_select(features = colnames(training_matrix),padding = TRUE, valuetype = "fixed") %>%
     dfm_weight(training_matrix@settings$weighting)
   gc()
   return(matrix[,sort(colnames(matrix))])

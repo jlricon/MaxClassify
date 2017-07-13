@@ -7,13 +7,13 @@
 trainMC = function(feature_matrix,code_vector, l1_regularizer = 0.0, l2_regularizer = 0.0, use_sgd = FALSE, set_heldout = 0, verbose = FALSE ){
 UseMethod("trainMC",feature_matrix)
 }
-
+#' @export
 trainMC.matrix = function(feature_matrix,code_vector, l1_regularizer = 0.0, l2_regularizer = 0.0, use_sgd = FALSE, set_heldout = 0, verbose = FALSE ){
   model   = maxent::maxent(feature_matrix,code_vector,
                            l1_regularizer = l1_regularizer,
                            l2_regularizer = l2_regularizer,
                            use_sgd        = use_sgd,
-                           set_heldout    = set_holdout,
+                           set_heldout    = set_heldout,
                            verbose        = verbose )
   returns = list()
   returns$model = model@model
@@ -21,13 +21,14 @@ trainMC.matrix = function(feature_matrix,code_vector, l1_regularizer = 0.0, l2_r
   attr(returns, "class") = "MaxEntModel"
   return(returns)
 }
-
+#' @export
 trainMC.dfm = function(feature_matrix, l1_regularizer = 0.0, l2_regularizer = 0.0, use_sgd = FALSE, set_heldout = 0, verbose = FALSE ){
-  model   = maxent::maxent(feature_matrix, feature_matrix@docvars$labels,
+  model   = maxent::maxent(feature_matrix,
+                           feature_matrix@docvars$labels,
                            l1_regularizer = l1_regularizer,
                            l2_regularizer = l2_regularizer,
                            use_sgd        = use_sgd,
-                           set_heldout    = set_holdout,
+                           set_heldout    = set_heldout,
                            verbose        = verbose )
   returns = list()
   returns$model = model@model
@@ -43,16 +44,17 @@ trainMC.dfm = function(feature_matrix, l1_regularizer = 0.0, l2_regularizer = 0.
 #' @return A data frame with predictions
 #' @export
 predictMC = function(model, feature_matrix, probabilities = -1, batches = 1 ){
-
+feature_matrix = as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
 if (class(model) != "MaxEntModel") stop("Model is not a MaxEntModel class!")
 modelS4 = new("maxent",model = model$model,weights = model$weights)
 
 if (batches > 1) {
   breakpoints = chunk2(seq(1:nrow(feature_matrix)),batches)
-  chunks  = lapply(X = breakpoints, function(x) as.matrix(feature_matrix[x,]))
+  chunks  = lapply(X = breakpoints, function(x) feature_matrix[x,])
   pred = do.call(rbind,parallel::mclapply(FUN = function(x) data.table::data.table(maxent::predict.maxent(modelS4, x)), X = chunks,mc.cores = batches))
 }
 else{
+
   pred = data.table::data.table(maxent::predict.maxent(modelS4, feature_matrix))
 }
 
@@ -74,3 +76,13 @@ else{
 
 }
 chunk2 <- function(x,n) split(x, cut(seq_along(x), n, labels = FALSE))
+
+#' Scores the performance of a model
+#' @param predicted Labels that were predicted
+#' @param real Actual labels
+#' @return Accuracy
+#' @export
+score = function(predicted, real){
+  if(length(predicted)!=length(real)) stop("Label vectors are not the same length")
+  sum(predicted==real)/length(real)
+}

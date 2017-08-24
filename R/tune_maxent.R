@@ -17,27 +17,28 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
     accuracy <- length(analyze[analyze == TRUE])/length(true_labels)
     return(accuracy)
   }
-  feature_matrix <- as.compressed.matrix(feature_matrix)
+  writeLines("Creating internal feature matrix")
+  feature_matrix <- as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
   if (verbose == TRUE)
-    writeLines("Testing 18 parameter configurations...")
-  l1_params <- c(seq(0, 1, 0.2), rep(0, length(seq(0, 1, 0.2))),
-                 seq(0, 1, 0.2))
-  l2_params <- c(rep(0, length(seq(0, 1, 0.2))), seq(0, 1,
-                                                     0.2), rep(0, length(seq(0, 1, 0.2))))
-  sgd_params <- c(rep(FALSE, 12), rep(TRUE, 6))
-  set_heldout_params <- c(rep(0, 6), round(dim(feature_matrix)[1]/(nfold *
-                                                                     2)), rep(0, 5), rep(0, 6))
+    writeLines("Testing 8 parameter configurations...")
+ # l1_params <- c(0,1,0.2,0,1,0.2,0,0)
+
+  l2_params <- c(0,0.5,1,5,10)
+  sgd_params=c(TRUE,rep(FALSE,4))
+
+
   rand <- sample(nfold, dim(feature_matrix)[1], replace = TRUE)
   fit_accuracy <- c()
-  for (n in 1:length(l1_params)) {
+  writeLines("Entering loop")
+  for (n in 1:length(l2_params)) {
     cv_accuracy <- c()
     ##############
     i = sort(unique(rand))
     cv_accuracy = unlist(parallel::mclapply(X = i ,mc.cores = cores, FUN = function(i){
    # for (i in sort(unique(rand))) {
       model <- maxent(feature_matrix[rand != i, ], feature_labels[rand !=
-                                                                 i], l1_regularizer = l1_params[n], l2_regularizer = l2_params[n],
-                      use_sgd = sgd_params[n], set_heldout = set_heldout_params[n],
+                                                                 i],  l2_regularizer = l2_params[n],
+                      use_sgd = sgd_params[n],
                       verbose = FALSE)
       pred <- predict(model, feature_matrix[rand == i,
                                             ])
@@ -51,12 +52,12 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
                 "-fold cross-validation): ", mean(cv_accuracy), sep = ""))
     fit_accuracy[n] <- mean(cv_accuracy)
   }
-  names <- c("l1_regularizer", "l2_regularizer", "use_sgd",
-             "set_heldout", "accuracy", "pct_best_fit")
+  names <- c( "l2_regularizer", "use_sgd",
+              "accuracy", "pct_best_fit")
   if (showall == FALSE) {
     optimal_fit <- which.max(fit_accuracy)
-    values <- c(l1_params[optimal_fit], l2_params[optimal_fit],
-                sgd_params[optimal_fit], set_heldout_params[optimal_fit],
+    values <- c(l2_params[optimal_fit],
+                sgd_params[optimal_fit],
                 max(fit_accuracy), 100)
     optimal <- rbind(values, deparse.level = 0)
     colnames(optimal) <- names
@@ -64,9 +65,9 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
   else {
     optimal <- rbind()
     best <- max(fit_accuracy)
-    for (optimal_fit in 1:length(l1_params)) {
-      values <- c(l1_params[optimal_fit], l2_params[optimal_fit],
-                  sgd_params[optimal_fit], set_heldout_params[optimal_fit],
+    for (optimal_fit in 1:length(l2_params)) {
+      values <- c( l2_params[optimal_fit],
+                  sgd_params[optimal_fit],
                   fit_accuracy[optimal_fit], fit_accuracy[optimal_fit]/best)
       optimal <- rbind(optimal, values, deparse.level = 0)
     }

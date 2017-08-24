@@ -9,7 +9,7 @@ create_weights_matrix = function(matrix, model) {
   if (class(model) != "MaxEntModel" | class(matrix) != "dfmSparse") stop("Model is not a MaxEntModel class or matrix is not dfm!")
   weights = data.table(model$weights) %>% dplyr::mutate(
       Label = as.character(Label),
-      Weight = as.numeric.factor(Weight),
+      Weight = as.numeric(as.character(Weight)),
       Feature = as.character(Feature)
     )
 
@@ -20,11 +20,12 @@ create_weights_matrix = function(matrix, model) {
   ))
   t = merge(weights, corres, by = "Feature", all.x = TRUE)
   t = as.data.frame.matrix(xtabs(data = t, Weight ~ Name + Label))
+  colnames(t) %<>% trimws(.)
   return(t)
 }
 
 #' Create a matrix from a vector of text. This function does not do any text cleaning.
-#' @param Text A vector of strings to be made into a matrix
+#' @param text A vector of strings to be made into a matrix
 #' @param labels Labels for classification
 #' @param minDocFreq Minimum frequency of a word to be included (count or fraction)
 #' @param maxDocFreq Maxmimum frequency of a word to be included (count or fraction)
@@ -36,15 +37,18 @@ create_weights_matrix = function(matrix, model) {
 #' @import quanteda
 #' @return A document feature matrix
 #' @export
-create_training_matrix = function(Text,labels, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
-                                    weighting=  "frequency", ngrams=1)
+create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
+                                    weighting=  "frequency", ngrams=1,features=NULL)
 {
-  matrix = quanteda::dfm(quanteda::corpus(Text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
+  matrix = quanteda::dfm(quanteda::corpus(text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
     quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength ) %>%
     quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq) %>% quanteda::dfm_weight(weighting)
+  if(!is.null(features)){
+    matrix = quanteda::dfm_select(matrix,selection="keep",features=features)
+  }
   matrix@settings$weighting = weighting
   matrix = matrix[,sort(colnames(matrix))]
-  gc()
+
   return(matrix)
 }
 
@@ -59,7 +63,7 @@ create_training_matrix = function(Text,labels, minDocFreq=1, maxDocFreq=Inf, min
 create_test_matrix = function(Text, training_matrix, ngrams = 1){
   matrix = dfm(corpus(Text),ngrams = ngrams, tolower = FALSE) %>% dfm_select(features = colnames(training_matrix),padding = TRUE, valuetype = "fixed") %>%
     dfm_weight(training_matrix@settings$weighting)
-  gc()
+
   return(matrix[,sort(colnames(matrix))])
 
 }

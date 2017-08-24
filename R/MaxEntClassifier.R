@@ -44,6 +44,26 @@ trainMC.dfm = function(feature_matrix, l1_regularizer = 0.0, l2_regularizer = 0.
 #' @return A data frame with predictions
 #' @export
 predictMC = function(model, feature_matrix, probabilities = -1, batches = 1 ){
+  #First and foremost, check if the model is empty. If it is empty, it is because there is only one label. Return that.
+  if(model$model==""){
+    class=as.character(model$weights$Label[1])
+    label=rep(class,feature_matrix@Dim[1])
+    probability=rep(1,feature_matrix@Dim[1])
+    if(probabilities %in% c(-1,1)){
+      #Return probability of class N
+      data.table(labels=label,prob=probability)
+      setnames(c("prob"),c(class))
+    }
+  }
+  if (batches =="auto"){
+    if(feature_matrix@Dim[1]>2000){
+      batches=2
+    }
+    else if(feature_matrix@Dim[1]>1000){
+      batches=2
+    }
+    else batches=1
+  }
 feature_matrix = as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
 if (class(model) != "MaxEntModel") stop("Model is not a MaxEntModel class!")
 modelS4 = new("maxent",model = model$model,weights = model$weights)

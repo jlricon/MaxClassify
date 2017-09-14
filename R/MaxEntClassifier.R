@@ -95,7 +95,8 @@ else{
 }
 
 }
-chunk2 <- function(x,n) split(x, cut(seq_along(x), n, labels = FALSE))
+#Splits vector into n cuts
+chunk2 = function(x,n) split(x, cut(seq_along(x), n, labels = FALSE))
 
 #' Scores the performance of a model
 #' @param predicted Labels that were predicted

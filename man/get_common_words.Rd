@@ -4,7 +4,7 @@
 \alias{get_common_words}
 \title{Returns common words for a matrix}
 \usage{
-get_common_words(text, labels, ngrams = 1, minDocFreq = 0.1, batches = 1)
+get_common_words(text, labels, ngrams = 1, minDocFreq = 0.01, batches = 1)
 }
 \arguments{
 \item{text}{A vector of strings to be made into a matrix}

@@ -38,13 +38,13 @@ create_weights_matrix = function(matrix, model) {
 #' @return A document feature matrix
 #' @export
 create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
-                                    weighting=  "frequency", ngrams=1,features=NULL)
+                                    weighting=  "frequency", ngrams=1, features=NULL, verbose = FALSE)
 {
   matrix = quanteda::dfm(quanteda::corpus(text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
     quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength ) %>%
     quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq) %>% quanteda::dfm_weight(weighting)
-  if(!is.null(features)){
-    matrix = quanteda::dfm_select(matrix,selection="keep",features=features)
+  if (!is.null(features)) {
+    matrix = quanteda::dfm_select(matrix,features,verbose = verbose)
   }
   matrix@settings$weighting = weighting
   matrix = matrix[,sort(colnames(matrix))]
@@ -60,8 +60,9 @@ create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, min
 #' @import quanteda
 #' @import magrittr
 #' @export
-create_test_matrix = function(Text, training_matrix, ngrams = 1){
-  matrix = dfm(corpus(Text),ngrams = ngrams, tolower = FALSE) %>% dfm_select(features = colnames(training_matrix),padding = TRUE, valuetype = "fixed") %>%
+create_test_matrix = function(Text, training_matrix, ngrams = 1, verbose = FALSE){
+  matrix = dfm(corpus(Text),ngrams = ngrams, tolower = FALSE) %>% dfm_select(training_matrix,
+                                                                                  verbose = verbose) %>%
     dfm_weight(training_matrix@settings$weighting)
 
   return(matrix[,sort(colnames(matrix))])

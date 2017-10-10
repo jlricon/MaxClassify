@@ -6,7 +6,7 @@
 \usage{
 create_training_matrix(text, labels, minDocFreq = 1, maxDocFreq = Inf,
   minWordLength = 0, maxWordLength = Inf, weighting = "frequency",
-  ngrams = 1, features = NULL)
+  ngrams = 1, features = NULL, verbose = FALSE)
 }
 \arguments{
 \item{text}{A vector of strings to be made into a matrix}

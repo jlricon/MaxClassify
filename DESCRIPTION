@@ -1,7 +1,7 @@
 Package: MaxClassify
 Type: Package
 Title: An efficient maximum entropy classifier, with some convenience functions
-Version: 0.1.0
+Version: 0.5.0
 Author: Jose Luis Ricon
 Maintainer: Jose Luis Ricon <Jose-Luis.Ricon@amey.co.uk>
 Description: An efficient maximum entropy classifier, with some convenience functions

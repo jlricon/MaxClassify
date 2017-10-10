@@ -4,7 +4,7 @@
 \alias{create_test_matrix}
 \title{Transforms a vector of text to the same format of a given training matrix (Retain same words)}
 \usage{
-create_test_matrix(Text, training_matrix, ngrams = 1)
+create_test_matrix(Text, training_matrix, ngrams = 1, verbose = FALSE)
 }
 \arguments{
 \item{Text}{Text to be adapted}

@@ -7,9 +7,11 @@
 #' @param cores How many cores to use
 #' @return A matrix with the best parameters found
 #' @export
+#' @import maxent
 tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE,
-          verbose = TRUE, cores = 1)
+          verbose = TRUE, cores = 1,l2_params=c(0,0.5,1,5,10),sgd_params=c(TRUE,rep(FALSE,4)))
 {
+  if (nfold < 2) stop("A minimum of two folds is required")
   recall_accuracy <- function(true_labels, predicted_labels) {
     true_labels <- as.vector(true_labels)
     predicted_labels <- as.vector(predicted_labels, mode = class(true_labels))
@@ -20,21 +22,19 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
   writeLines("Creating internal feature matrix")
   feature_matrix <- as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
   if (verbose == TRUE)
-    writeLines("Testing 8 parameter configurations...")
+    writeLines(paste0("Testing ",length(l2_params)*2," parameter configurations..."))
  # l1_params <- c(0,1,0.2,0,1,0.2,0,0)
-
-  l2_params <- c(0,0.5,1,5,10)
-  sgd_params=c(TRUE,rep(FALSE,4))
 
 
   rand <- sample(nfold, dim(feature_matrix)[1], replace = TRUE)
   fit_accuracy <- c()
   writeLines("Entering loop")
+  cl = parallel::makeCluster(cores)
   for (n in 1:length(l2_params)) {
     cv_accuracy <- c()
     ##############
     i = sort(unique(rand))
-    cv_accuracy = unlist(parallel::mclapply(X = i ,mc.cores = cores, FUN = function(i){
+    cv_accuracy = unlist(parallel::parLapply(cl=cl, X = i , fun = function(i,feature_matrix,rand,feature_labels,l2_params,sgd_params,model){
    # for (i in sort(unique(rand))) {
       model <- maxent(feature_matrix[rand != i, ], feature_labels[rand !=
                                                                  i],  l2_regularizer = l2_params[n],
@@ -45,13 +45,14 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
       pred <- pred[, 1]
       recall_accuracy(feature_labels[rand ==i], pred)
 
-    }))
+    },feature_matrix=feature_matrix,rand=rand,feature_labels=feature_labels,l2_params=l2_params,sgd_params=sgd_params,model=model))
     ############
     if (verbose == TRUE)
       writeLines(paste("Configuration: ", n, " Accuracy (", nfold,
                 "-fold cross-validation): ", mean(cv_accuracy), sep = ""))
     fit_accuracy[n] <- mean(cv_accuracy)
   }
+  parallel::stopCluster(cl)
   names <- c( "l2_regularizer", "use_sgd",
               "accuracy", "pct_best_fit")
   if (showall == FALSE) {

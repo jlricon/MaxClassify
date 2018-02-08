@@ -5,7 +5,7 @@
 \title{Returns common words for a matrix}
 \usage{
 get_common_words_single(text, minDocFreq = 1, maxDocFreq = Inf,
-  minWordLength = 0, maxWordLength = Inf, weighting = "frequency",
+  minWordLength = 0, maxWordLength = Inf, weighting = "count",
   ngrams = 1, minCount = 1, verbose = FALSE)
 }
 \arguments{

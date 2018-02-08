@@ -5,7 +5,8 @@
 \title{Tunes a MaxEnt classifier)}
 \usage{
 tune_MaxEnt(feature_matrix, feature_labels, nfold = 3, showall = TRUE,
-  verbose = TRUE, cores = 1)
+  verbose = TRUE, cores = 1, l2_params = c(0, 0.5, 1, 5, 10),
+  sgd_params = c(TRUE, rep(FALSE, 4)))
 }
 \arguments{
 \item{feature_matrix}{A matrix with features}

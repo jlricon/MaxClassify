@@ -3,18 +3,20 @@
 #' @param text A vector of strings to be made into a matrix
 #' @return A document feature matrix
 #' @export
-get_common_words = function(text,labels,ngrams=1,minDocFreq=0.01,batches=1){
+get_common_words = function(text,labels,ngrams=1,minDocFreq=0.01,batches=1,verbose=FALSE){
   t=split(text,labels)
 
   batches = if(batches=="auto") if(length(text)<1000) 1 else parallel::detectCores() else batches
 
 
   if (batches==1){
-    trainingmats = lapply(t,get_common_words_single,ngrams = ngrams,minDocFreq = minDocFreq)
+    trainingmats = lapply(t,get_common_words_single,ngrams = ngrams,minDocFreq = minDocFreq,verbose=verbose)
   }
   else{
-    trainingmats=parallel::mclapply(X=t,FUN=get_common_words_single,ngrams=ngrams,minDocFreq=minDocFreq,mc.cores=batches)
-  }
+    cluster=parallel::makeCluster(batches)
+    trainingmats=parallel::parLapply(cl=cluster,X = t,fun =get_common_words_single,ngrams=ngrams,minDocFreq=minDocFreq,verbose=verbose )
+    parallel::stopCluster(cluster)
+    }
 
   unique(unlist(trainingmats))
 }
@@ -32,7 +34,7 @@ get_common_words = function(text,labels,ngrams=1,minDocFreq=0.01,batches=1){
 #' @return A document feature matrix
 #' @export
 get_common_words_single= function(text, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
-                                  weighting=  "frequency", ngrams=1,minCount=1,verbose=FALSE)
+                                  weighting=  "count", ngrams=1,minCount=1,verbose=FALSE)
 {
   matrix = quanteda::dfm(quanteda::corpus(text),ngrams = ngrams, tolower = FALSE) %>%
     quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength,verbose=verbose ) %>%
@@ -42,3 +44,5 @@ get_common_words_single= function(text, minDocFreq=1, maxDocFreq=Inf, minWordLen
 
   return(matrix@Dimnames$features)
 }
+
+

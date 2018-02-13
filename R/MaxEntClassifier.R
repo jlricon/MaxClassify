@@ -44,15 +44,19 @@ trainMC.dfm = function(feature_matrix, l1_regularizer = 0.0, l2_regularizer = 0.
 #' @return A data frame with predictions
 #' @export
 predictMC = function(model, feature_matrix, probabilities = -1, batches = 1 ){
-  #First and foremost, check if the model is empty. If it is empty, it is because there is only one label. Return that.
+  #First and foremost, check if the model is empty. If it is empty, it is because there is only one label. Return that
+  if (!(probabilities %in% c(-1,0,1))) stop("Probabilities must be in [-1,0,1]")
   if (model$model == "") {
-    class = as.character(model$weights$Label[1])
+
+    class = as.character(model$weights$Label[1])  %>% trimws()
     label = rep(class,feature_matrix@Dim[1])
     probability = rep(1,feature_matrix@Dim[1])
     if (probabilities %in% c(-1,1)) {
       #Return probability of class N
-      data.table(labels = label,prob = probability)
-      setnames(c("prob"),c(class))
+      return(data.table(labels = label,prob = probability) %>%  setnames(c("prob"),c(class)))
+    }
+    else{
+      return(data.table(labels = label))
     }
   }
   if (batches == "auto") {

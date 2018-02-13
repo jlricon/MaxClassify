@@ -5,7 +5,7 @@
 \title{Create a matrix from a vector of text. This function does not do any text cleaning.}
 \usage{
 create_training_matrix(text, labels, minDocFreq = 1, maxDocFreq = Inf,
-  minWordLength = 0, maxWordLength = Inf, weighting = "frequency",
+  minWordLength = 0, maxWordLength = Inf, weighting = "count",
   ngrams = 1, features = NULL, verbose = FALSE)
 }
 \arguments{

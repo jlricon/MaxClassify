@@ -6,12 +6,10 @@
 #' @import data.table
 #' @export
 create_weights_matrix = function(matrix, model) {
-  if (class(model) != "MaxEntModel" | class(matrix) != "dfmSparse") stop("Model is not a MaxEntModel class or matrix is not dfm!")
-  weights = data.table(model$weights) %>% dplyr::mutate(
-      Label = as.character(Label),
-      Weight = as.numeric(as.character(Weight)),
-      Feature = as.character(Feature)
-    )
+  if (class(model) != "MaxEntModel" | class(matrix) != "dfm") stop("Model is not a MaxEntModel class or matrix is not dfm!")
+  weights = data.table(model$weights)
+  weights[,.("Label", "Weight", "Feature") := list(as.character(Label),as.numeric(as.character(Weight)),as.character(Feature))]
+
 
   corres = data.frame(list(
     Name = matrix@Dimnames$features, Feature = as.character(seq(1:length(

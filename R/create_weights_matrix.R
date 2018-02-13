@@ -38,7 +38,7 @@ create_weights_matrix = function(matrix, model) {
 #' @return A document feature matrix
 #' @export
 create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
-                                    weighting=  "frequency", ngrams=1, features=NULL, verbose = FALSE)
+                                    weighting=  "count", ngrams=1, features=NULL, verbose = FALSE)
 {
   matrix = quanteda::dfm(quanteda::corpus(text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
     quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength ) %>%

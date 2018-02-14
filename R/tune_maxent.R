@@ -34,7 +34,7 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
     cv_accuracy <- c()
     ##############
     i = sort(unique(rand))
-    cv_accuracy = unlist(parallel::parLapply(cl=cl, X = i , fun = function(i,feature_matrix,rand,feature_labels,l2_params,sgd_params,model){
+    cv_accuracy = unlist(parallel::parLapply(cl=cl, X = i , fun = function(i,feature_matrix,rand,feature_labels,l2_params,sgd_params){
    # for (i in sort(unique(rand))) {
       model <- maxent(feature_matrix[rand != i, ], feature_labels[rand !=
                                                                  i],  l2_regularizer = l2_params[n],
@@ -45,7 +45,7 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
       pred <- pred[, 1]
       recall_accuracy(feature_labels[rand ==i], pred)
 
-    },feature_matrix=feature_matrix,rand=rand,feature_labels=feature_labels,l2_params=l2_params,sgd_params=sgd_params,model=model))
+    },feature_matrix=feature_matrix,rand=rand,feature_labels=feature_labels,l2_params=l2_params,sgd_params=sgd_params))
     ############
     if (verbose == TRUE)
       writeLines(paste("Configuration: ", n, " Accuracy (", nfold,

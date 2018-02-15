@@ -20,9 +20,9 @@ tune_MaxEnt = function(feature_matrix, feature_labels, nfold = 3, showall = TRUE
     return(accuracy)
   }
   writeLines("Creating internal feature matrix")
-  feature_matrix <- as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
+  feature_matrix <- as(Matrix::sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
   if (verbose == TRUE)
-    writeLines(paste0("Testing ",length(l2_params)*2," parameter configurations..."))
+    writeLines(paste0("Testing ",length(l2_params)," parameter configurations..."))
  # l1_params <- c(0,1,0.2,0,1,0.2,0,0)
 
 

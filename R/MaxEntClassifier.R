@@ -77,7 +77,7 @@ modelS4 = new("maxent",model = model$model,weights = model$weights)
 if (batches > 1) {
   breakpoints = chunk2(seq(1:nrow(feature_matrix)),batches)
   chunks  = lapply(X = breakpoints, function(x) feature_matrix[x,])
-  pred = do.call(rbind,parallel::parLapply(function(x) data.table::data.table(maxent::predict.maxent(modelS4, x)), X = chunks,cl = cl))
+  pred = do.call(rbind,parallel::parLapply(cl,chunks,function(x) data.table::data.table(maxent::predict.maxent(modelS4, x))))
 }
 else{
 

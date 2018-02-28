@@ -70,14 +70,14 @@ predictMC = function(model, feature_matrix, probabilities = -1, batches = 1 ){
 
   }
   if ( batches > 1) cl = parallel::makeCluster(batches)
-feature_matrix = as(sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
+feature_matrix = as(Matrix::sparseMatrix(i = feature_matrix@i, p = feature_matrix@p, x = feature_matrix@x,index1 = FALSE), "matrix.csr")
 if (class(model) != "MaxEntModel") stop("Model is not a MaxEntModel class!")
 modelS4 = new("maxent",model = model$model,weights = model$weights)
 
 if (batches > 1) {
   breakpoints = chunk2(seq(1:nrow(feature_matrix)),batches)
   chunks  = lapply(X = breakpoints, function(x) feature_matrix[x,])
-  pred = do.call(rbind,parallel::parLapply(cl,chunks,function(x) data.table::data.table(maxent::predict.maxent(modelS4, x))))
+  pred = do.call(rbind,parallel::parLapply(cl = cl,X = chunks,fun = function(x) data.table::data.table(maxent::predict.maxent(modelS4, x))))
 }
 else{
 

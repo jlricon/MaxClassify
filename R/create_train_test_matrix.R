@@ -16,7 +16,7 @@ create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, min
 {
   matrix = quanteda::dfm(quanteda::corpus(text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
     quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength ) %>%
-    quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq) %>% quanteda::dfm_weight(weighting)
+    quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq,docfreq_type = "prop") %>% quanteda::dfm_weight(weighting)
   if (!is.null(features)) {
     matrix = quanteda::dfm_select(matrix,features,verbose = verbose)
   }

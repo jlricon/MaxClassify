@@ -34,11 +34,11 @@ get_common_words = function(text,labels,ngrams=1,minDocFreq=0.01,batches=1,verbo
 #' @return A document feature matrix
 #' @export
 get_common_words_single= function(text, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
-                                  weighting=  "count", ngrams=1,minCount=1,verbose=FALSE)
+                                  weighting=  "count", ngrams=1,minCount = 1,verbose = FALSE)
 {
   matrix = quanteda::dfm(quanteda::corpus(text),ngrams = ngrams, tolower = FALSE) %>%
     quanteda::dfm_select(selection = "keep",min_nchar = minWordLength, max_nchar = maxWordLength,verbose=verbose ) %>%
-    quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq,verbose=verbose) %>% quanteda::dfm_weight(weighting)
+    quanteda::dfm_trim(.,min_docfreq = minDocFreq, max_docfreq = maxDocFreq,verbose = verbose,docfreq_type="prop") %>% quanteda::dfm_weight(weighting)
   matrix@settings$weighting = weighting
   matrix = matrix[,sort(colnames(matrix))]
 

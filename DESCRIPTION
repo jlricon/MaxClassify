@@ -1,13 +1,13 @@
 Package: MaxClassify
 Type: Package
 Title: An efficient maximum entropy classifier, with some convenience functions
-Version: 0.8.0
+Version: 0.9.0
 Author: Jose Luis Ricon
 Maintainer: Jose Luis Ricon <Jose-Luis.Ricon@amey.co.uk>
 Description: An efficient maximum entropy classifier, with some convenience functions
 License: GPL
 Encoding: UTF-8
-Depends: R (>= 2.13.0), methods, SparseM, maxent (>= 1.3.2), parallel, data.table, magrittr, quanteda, Matrix
+Depends: R (>= 3.4.0), methods, SparseM, maxent (>= 1.3.2), parallel, data.table, magrittr, quanteda, Matrix
 LazyData: true
 RoxygenNote: 6.0.1
 Suggests: testthat

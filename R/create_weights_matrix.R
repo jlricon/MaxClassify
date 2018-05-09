@@ -17,7 +17,7 @@ create_weights_matrix = function(matrix, model) {
     )))
   ))
   t = merge(weights, corres, by = "Feature", all.x = TRUE)
-  t = as.data.frame.matrix(xtabs(data = t, Weight ~ Name + Label))
+  t = as.data.frame.matrix(stats::xtabs(data = t, Weight ~ Name + Label))
   colnames(t) %<>% trimws(.)
   return(t)
 }

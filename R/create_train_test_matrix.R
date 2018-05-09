@@ -1,17 +1,18 @@
 #' Create a matrix from a vector of text. This function does not do any text cleaning.
 #' @param text A vector of strings to be made into a matrix
 #' @param labels Labels for classification
-#' @param minDocFreq Minimum frequency of a word to be included (count or fraction)
-#' @param maxDocFreq Maxmimum frequency of a word to be included (count or fraction)
+#' @param minDocFreq Minimum frequency of a word to be included (fraction)
+#' @param maxDocFreq Maxmimum frequency of a word to be included (fraction)
 #' @param minWordLength Minimum wordlength for a word to be included
 #' @param maxWordLength Maximum wordlength for a word to be included
 #' @param weighting Weighting to use. Choose between frequency, relFreq, relMaxFreq, logFreq, tfidf (See dfm_weight)
 #' @param ngrams Vector that specifies type of ngrams to generate
+#' @param features Features to keep
 #' @import magrittr
 #' @import quanteda
 #' @return A document feature matrix
 #' @export
-create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, minWordLength=0, maxWordLength=Inf,
+create_training_matrix = function(text,labels, minDocFreq=0, maxDocFreq=1, minWordLength=0, maxWordLength=Inf,
                                   weighting=  "count", ngrams=1, features=NULL, verbose = FALSE)
 {
   matrix = quanteda::dfm(quanteda::corpus(text,docvars = data.frame(labels = labels)),ngrams = ngrams, tolower = FALSE) %>%
@@ -30,6 +31,7 @@ create_training_matrix = function(text,labels, minDocFreq=1, maxDocFreq=Inf, min
 #' @param training_matrix The matrix that was used to train the model
 #' @param Text Text to be adapted
 #' @param ngrams Vector that specifies type of ngrams to generate
+#' @param verbose Outputs some info
 #' @return An adapted matrix
 #' @import quanteda
 #' @import magrittr

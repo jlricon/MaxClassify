@@ -1,4 +1,6 @@
 # MaxClassify
+![travis](https://travis-ci.org/jlricon/MaxClassify.svg?branch=master)
+
 This package is a wrapper around the maxent R package. It includes a few convenience functions to be able to work with it using text directly.
 
 It has a few improvements over the base package:
